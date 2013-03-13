@@ -104,9 +104,10 @@ namespace XSerializer
 
             object currentKey = null;
             object currentValue = null;
-
+            bool shouldIssueRead;
             do
             {
+                shouldIssueRead = true;
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
@@ -121,11 +122,11 @@ namespace XSerializer
                         }
                         else if (reader.Name == "Key")
                         {
-                            currentKey = DeserializeKeyOrValue(reader, _keySerializer, hasInstanceBeenCreated, isInsideItemElement);
+                            currentKey = DeserializeKeyOrValue(reader, _keySerializer, hasInstanceBeenCreated, isInsideItemElement, out shouldIssueRead);
                         }
                         else if (reader.Name == "Value")
                         {
-                            currentValue = DeserializeKeyOrValue(reader, _valueSerializer, hasInstanceBeenCreated, isInsideItemElement);
+                            currentValue = DeserializeKeyOrValue(reader, _valueSerializer, hasInstanceBeenCreated, isInsideItemElement, out shouldIssueRead);
                         }
 
                         break;
@@ -144,13 +145,20 @@ namespace XSerializer
 
                         break;
                 }
-            } while (reader.Read());
+            } while (ReadNextElementIfNeeded(reader,shouldIssueRead));
 
             throw new SerializationException("Poop in a hoop.");
         }
 
-        private static object DeserializeKeyOrValue(XmlReader reader, IXmlSerializer serializer, bool hasInstanceBeenCreated, bool isInsideElement)
+        private static bool ReadNextElementIfNeeded(XmlReader reader, bool shouldRead)
         {
+            return (shouldRead) ? reader.Read() : true;
+        }
+
+        
+        private static object DeserializeKeyOrValue(XmlReader reader, IXmlSerializer serializer, bool hasInstanceBeenCreated, bool isInsideElement, out bool shouldIssueRead)
+        {
+            var initialElementName = reader.Name;
             if (!hasInstanceBeenCreated)
             {
                 throw new SerializationException("le sigh.");
@@ -161,7 +169,12 @@ namespace XSerializer
                 throw new SerializationException("Really? REALLY?");
             }
 
-            return serializer.DeserializeObject(reader);
+            var deserialized = serializer.DeserializeObject(reader);
+            var finalElementName = reader.Name;
+
+            shouldIssueRead = (initialElementName == finalElementName);
+
+            return deserialized;
         }
 
         private static object CheckAndReturn(bool hasInstanceBeenCreated, object instance)
