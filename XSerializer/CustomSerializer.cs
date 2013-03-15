@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -20,7 +21,20 @@ namespace XSerializer
 
             if (!_serializerCache.TryGetValue(key, out serializer))
             {
-                serializer = (IXmlSerializer)Activator.CreateInstance(typeof(CustomSerializer<>).MakeGenericType(type), defaultNamespace, extraTypes, rootElementName);
+                try
+                {
+                    serializer =
+                        (IXmlSerializer)
+                        Activator.CreateInstance(typeof (CustomSerializer<>).MakeGenericType(type), defaultNamespace,
+                                                 extraTypes, rootElementName);
+                }
+                // True exception gets masked due to reflection. Preserve stacktrace and rethrow
+                catch (TargetInvocationException ex)
+                {
+                    PreserveStackTrace(ex);
+
+                    throw ex.InnerException;
+                }
                 _serializerCache[key] = serializer;
             }
 
@@ -36,6 +50,20 @@ namespace XSerializer
                 return key;
             }
         }
+
+        //Stackoverflow is awesome
+        private static void PreserveStackTrace(Exception e)
+        {
+            var ctx = new StreamingContext(StreamingContextStates.CrossAppDomain);
+            var mgr = new ObjectManager(null, ctx);
+            var si = new SerializationInfo(e.GetType(), new FormatterConverter());
+
+            e.GetObjectData(si, ctx);
+            mgr.RegisterObject(e, 1, si); // prepare for SetObjectData
+            mgr.DoFixups(); // ObjectManager calls SetObjectData
+
+            // voila, e is unmodified save for _remoteStackTraceString
+        }
     }
 
     public class CustomSerializer<T> : CustomSerializer, IXmlSerializer<T>
@@ -47,22 +75,11 @@ namespace XSerializer
         public CustomSerializer(string defaultNamespace, Type[] extraTypes, string rootElementName)
         {
             _defaultNamespace = defaultNamespace;
-            if (!string.IsNullOrWhiteSpace(rootElementName))
-            {
-                _rootElementName = rootElementName;
-            }
-            else
-            {
-                var xmlRootAttribute = (XmlRootAttribute)typeof(T).GetCustomAttributes(typeof(XmlRootAttribute), true).FirstOrDefault();
-                if (xmlRootAttribute != null && !string.IsNullOrWhiteSpace(xmlRootAttribute.ElementName))
-                {
-                    _rootElementName = xmlRootAttribute.ElementName;
-                }
-                else
-                {
-                    _rootElementName = typeof(T).Name;
-                }
-            }
+            var type = typeof (T);
+
+            _rootElementName = !string.IsNullOrWhiteSpace(rootElementName) ? rootElementName : GetRootElement(type);
+
+            AssertValidHeirarchy(type);
 
             var types = new List<Type>();
 
@@ -71,11 +88,11 @@ namespace XSerializer
                 types.AddRange(extraTypes);
             }
 
-            types.AddRange(typeof(T).GetCustomAttributes(typeof(XmlIncludeAttribute), true).Cast<XmlIncludeAttribute>().Select(a => a.Type));
+            types.AddRange(type.GetCustomAttributes(typeof(XmlIncludeAttribute), true).Cast<XmlIncludeAttribute>().Select(a => a.Type));
 
-            if (!typeof(T).IsInterface && !typeof(T).IsAbstract)
+            if (!type.IsInterface && !type.IsAbstract)
             {
-                types.Insert(0, typeof(T));
+                types.Insert(0, type);
             }
 
             _serializablePropertiesMap =
@@ -87,6 +104,178 @@ namespace XSerializer
                         .Select(p => new SerializableProperty(p, defaultNamespace, extraTypes))
                         .OrderBy(p => p.NodeType)
                         .ToArray());
+        }
+
+        private void AssertValidHeirarchy(Type type)
+        {
+            if (type.BaseType == typeof (object)) return;
+
+            var properties = type.GetProperties();
+
+            foreach (var property in properties)
+            {
+                var derivedXmlElement = GetAttribute<XmlElementAttribute>(property);
+                var derivedXmlAttribute = GetAttribute<XmlAttributeAttribute>(property);
+                var baseProperty = GetBaseProperty(property);
+                var hasBaseProperty = baseProperty != null;
+
+                if (hasBaseProperty)
+                {
+                    AssertPropertyHeirarchy(baseProperty, derivedXmlElement, derivedXmlAttribute);
+                }
+
+                if (derivedXmlAttribute != null && !hasBaseProperty)
+                {
+                    if(string.IsNullOrWhiteSpace(derivedXmlAttribute.AttributeName))
+                        throw new InvalidOperationException("XmlAttribute must have a value.");
+                }
+
+                if (derivedXmlElement != null && !hasBaseProperty)
+                {
+                    if (string.IsNullOrWhiteSpace(derivedXmlElement.ElementName))
+                        throw new InvalidOperationException("XmlElement must have a value.");
+                }
+            }
+        }
+
+        private void AssertPropertyHeirarchy(PropertyInfo baseProperty, XmlElementAttribute derivedXmlElement, XmlAttributeAttribute derivedXmlAttribute)
+        {
+            var baseXmlElement = GetAttribute<XmlElementAttribute>(baseProperty);
+            var baseXmlAttribute = GetAttribute<XmlAttributeAttribute>(baseProperty);
+
+            if (baseXmlAttribute != null)
+            {
+                if (derivedXmlElement != null)
+                {
+                    throw new InvalidOperationException("Derived XmlElement cannot override Base XmlAttribute.");
+                }
+
+                if (derivedXmlAttribute != null)
+                {
+                    if (string.IsNullOrWhiteSpace(derivedXmlAttribute.AttributeName))
+                    {
+                        if (!string.IsNullOrWhiteSpace(baseXmlAttribute.AttributeName))
+                        {
+                            throw new InvalidOperationException("Overridden property must have non-empty Attribute.");
+                        }
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(baseXmlAttribute.AttributeName) && !string.IsNullOrWhiteSpace(derivedXmlAttribute.AttributeName))
+                        {
+                            throw new InvalidOperationException("Virtual property must have non-empty XmlAttribute.");
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(baseXmlAttribute.AttributeName) && baseXmlAttribute.AttributeName != derivedXmlAttribute.AttributeName)
+                        {
+                            throw new InvalidOperationException("Base property and dervied property must have the same attribute.");
+                        }
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(baseXmlAttribute.AttributeName))
+                    {
+                        throw new InvalidOperationException("Overridden property must override XmlAttribute");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(baseXmlAttribute.AttributeName)) // && string.IsNullOrWhiteSpace(derivedXmlAttribute.AttributeName)
+                    {
+                        throw new InvalidOperationException("Virtual property must have non-empty XmlAttribute.");
+                    }
+                }
+            }
+            else
+            {
+                if (derivedXmlAttribute != null)
+                {
+                    throw new InvalidOperationException("Virtual property must have non-empty XmlAttribute.");
+                }
+            }
+            
+            
+
+            if (baseXmlElement != null)
+            {
+                if (derivedXmlAttribute != null)
+                {
+                    throw new InvalidOperationException("Derived XmlAttribute cannot override Base XmlElement.");
+                }
+
+                if (derivedXmlElement != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(baseXmlElement.ElementName))
+                    {
+                        if (string.IsNullOrWhiteSpace(derivedXmlElement.ElementName))
+                        {
+                            throw new InvalidOperationException("Cannot have non-empty Xml Element.");
+                        }
+                        
+                        if (derivedXmlElement.ElementName != baseXmlElement.ElementName)
+                        {
+                            throw new InvalidOperationException("Dervied Element cannot be different from Base element.");
+                        }
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(derivedXmlElement.ElementName))
+                        {
+                            throw new InvalidOperationException("Base element cannot be empty.");
+                        }
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(baseXmlElement.ElementName))
+                    {
+                        throw new InvalidOperationException("Dervied property must override base property XmlElement.");
+                    }
+                }
+            }
+            else
+            {
+                if (derivedXmlElement != null && !string.IsNullOrWhiteSpace(derivedXmlElement.ElementName))
+                {
+                    throw new InvalidOperationException("Base property must have XmlElement.");
+                }
+            }
+        }
+
+        private static PropertyInfo GetBaseProperty(PropertyInfo propertyInfo)
+        {
+            var method = propertyInfo.GetAccessors(true)[0];
+            if (method == null)
+                return null;
+
+            var baseMethod = method.GetBaseDefinition();
+
+            if (baseMethod == method)
+                return propertyInfo;
+
+            const BindingFlags allProperties = BindingFlags.Instance | BindingFlags.Public
+                                               | BindingFlags.NonPublic | BindingFlags.Static;
+
+            var arguments = propertyInfo.GetIndexParameters().Select(p => p.ParameterType).ToArray();
+
+            Debug.Assert(baseMethod.DeclaringType != null);
+
+            return baseMethod.DeclaringType.GetProperty(propertyInfo.Name, allProperties,
+                null, propertyInfo.PropertyType, arguments, null);
+        }
+
+        private TAttribute GetAttribute<TAttribute>(PropertyInfo property) where TAttribute: Attribute
+        {
+            return property.GetCustomAttributes(typeof(TAttribute), false).FirstOrDefault() as TAttribute;
+        }
+
+        private static string GetRootElement(Type type)
+        {
+            var xmlRootAttribute = (XmlRootAttribute)type.GetCustomAttributes(typeof(XmlRootAttribute), true).FirstOrDefault();
+            if (xmlRootAttribute != null && !string.IsNullOrWhiteSpace(xmlRootAttribute.ElementName))
+            {
+                return xmlRootAttribute.ElementName;
+            }
+            return type.Name;
         }
 
         public void Serialize(SerializationXmlTextWriter writer, T instance, XmlSerializerNamespaces namespaces)

@@ -74,7 +74,7 @@ namespace XSerializer
                 return () => new XmlTextSerializer(propertyInfo.PropertyType);
             }
 
-            var elementAttribute = (XmlElementAttribute)Attribute.GetCustomAttribute(propertyInfo, typeof(XmlElementAttribute));
+            var elementAttribute = (XmlElementAttribute)Attribute.GetCustomAttribute(propertyInfo, typeof(XmlElementAttribute), false);
 
             string rootElementName;
             if (elementAttribute != null && !string.IsNullOrWhiteSpace(elementAttribute.ElementName))
