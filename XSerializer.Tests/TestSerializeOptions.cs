@@ -29,5 +29,6 @@ namespace XSerializer.Tests
         public IEncryptionMechanism EncryptionMechanism { get; set; }
         public object EncryptKey { get; set; }
         public SerializationState SerializationState { get; set; }
+        public bool DotNetFrameworkSerializerCompatable { get; set; }
     }
 }
