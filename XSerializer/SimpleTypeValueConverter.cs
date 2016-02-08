@@ -102,6 +102,11 @@ namespace XSerializer
                 return ParseStringForNullableGuid;
             }
 
+            if (type == typeof(char) || type == typeof(char?))
+            {
+                return (value, options) => string.IsNullOrEmpty(value) || value == "XXXXXX" ? defaultValue : ParseStringForChar(value, options);
+            }
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 return (value, options) => string.IsNullOrEmpty(value) ? null : Convert.ChangeType(value, type.GetGenericArguments()[0]);
@@ -135,6 +140,11 @@ namespace XSerializer
             if (type == typeof(TimeSpan) || type == typeof(TimeSpan?))
             {
                 return (value, options) => redactAttribute.Redact((TimeSpan?)value, options.ShouldRedact);
+            }
+
+            if (type == typeof(char) || type == typeof(char?))
+            {
+                return (value, options) => redactAttribute.Redact((char?)value, options.ShouldRedact, options.DotNetFrameworkSerializerCompatable);
             }
 
             return (value, options) => redactAttribute.Redact(value, options.ShouldRedact);
@@ -196,6 +206,11 @@ namespace XSerializer
                 return ParseStringForNullableGuid;
             }
 
+            if (type == typeof(char) || type == typeof(char?))
+            {
+                return ParseStringForChar;
+            }
+
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 return (value, options) => string.IsNullOrEmpty(value) ? null : Convert.ChangeType(value, type.GetGenericArguments()[0]);
@@ -247,6 +262,16 @@ namespace XSerializer
             if (type == typeof(TimeSpan?))
             {
                 return GetStringFromNullableTimeSpan;
+            }
+
+            if (type == typeof(char))
+            {
+                return GetStringFromChar;
+            }
+
+            if (type == typeof(char?))
+            {
+                return GetStringFromNullableChar;
             }
 
             return (value, options) => value.ToString();
@@ -344,6 +369,26 @@ namespace XSerializer
             return Guid.Parse(value);
         }
 
+        private static object ParseStringForChar(string value, ISerializeOptions options)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return default(char);
+            }
+
+            // .Net serializers (XmlSerializer & DataContractSerializer) serialize char types as integers
+            if (options.DotNetFrameworkSerializerCompatable)
+            {
+                int asciiValue = int.Parse(value);
+                if (asciiValue >= char.MinValue && asciiValue <= char.MaxValue)
+                {
+                    return (char)asciiValue;
+                }
+            }
+
+            return (char)Convert.ChangeType(value, typeof(char));
+        }
+
         private static string GetStringFromBool(object value, ISerializeOptions options)
         {
             return value.ToString().ToLower();
@@ -385,6 +430,24 @@ namespace XSerializer
         private static string GetStringFromNullableTimeSpan(object value, ISerializeOptions options)
         {
             return value == null ? null : GetStringFromTimeSpan(value, options);
+        }
+
+        private static string GetStringFromChar(object value, ISerializeOptions options)
+        {
+            char ch = (char)value;
+
+            // .Net serializers (XmlSerializer & DataContractSerializer) serialize char types as integers
+            if (options.DotNetFrameworkSerializerCompatable)
+            {
+                return ((int)ch).ToString();
+            }
+
+            return ch.ToString();
+        }
+
+        private static string GetStringFromNullableChar(object value, ISerializeOptions options)
+        {
+            return value == null ? null : GetStringFromNullableChar(value, options);
         }
 
         private static int CreateKey(Type type, RedactAttribute redactAttribute)

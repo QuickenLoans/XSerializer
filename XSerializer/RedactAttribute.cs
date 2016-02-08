@@ -112,6 +112,33 @@ namespace XSerializer
         }
 
         /// <summary>
+        /// Redacts the string representation of <paramref name="charValue"/>.
+        /// </summary>
+        /// <param name="charValue">The character value.</param>
+        /// <param name="redactEnabled">Whether redaction is currently enabled</param>
+        /// <param name="serializeAsIntegerValue">Whether to serialize as integer value</param>
+        /// <returns>The redacted text.</returns>
+        public string Redact(char? charValue, bool redactEnabled, bool serializeAsIntegerValue)
+        {
+            if (charValue == null)
+            {
+                return null;
+            }
+
+            if (redactEnabled)
+            {
+                return "XXXXXX";
+            }
+
+            if (serializeAsIntegerValue)
+            {
+                return ((int)charValue.Value).ToString();
+            }
+
+            return charValue.ToString();
+        }
+
+        /// <summary>
         /// Redacts the string representation of <paramref name="value"/>.
         /// </summary>
         /// <param name="value">An object.</param>

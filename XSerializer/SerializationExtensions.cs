@@ -172,7 +172,8 @@ namespace XSerializer
                 ShouldAlwaysEmitTypes = serializeOptions.ShouldAlwaysEmitTypes,
                 ShouldEmitNil = serializeOptions.ShouldEmitNil,
                 ShouldEncrypt = serializeOptions.ShouldEncrypt,
-                ShouldRedact = serializeOptions.ShouldRedact
+                ShouldRedact = serializeOptions.ShouldRedact,
+                DotNetFrameworkSerializerCompatable = serializeOptions.DotNetFrameworkSerializerCompatable
             };
         }
 
@@ -186,6 +187,7 @@ namespace XSerializer
             public IEncryptionMechanism EncryptionMechanism { get; set; }
             public object EncryptKey { get; set; }
             public SerializationState SerializationState { get; set; }
+            public bool DotNetFrameworkSerializerCompatable { get; set; }
         }
 
         /// <summary>

@@ -76,6 +76,29 @@ namespace XSerializer.Tests
             Assert.That(xml, Contains.Substring(string.Format("<BoolTextProperty>{0}</BoolTextProperty>", expectedAttributeValue)));
         }
 
+        [TestCase('A', "XXXXXX")]
+        public void NullableCharTextRedactsCorrectly(char value, string expectedAttributeValue)
+        {
+            _testClass.NullableCharTextProperty = new NullableCharText { Value = value };
+
+            var xml = Serialize();
+            Console.WriteLine(xml);
+
+            Assert.That(xml, Contains.Substring(string.Format("<NullableCharTextProperty>{0}</NullableCharTextProperty>", expectedAttributeValue)));
+        }
+
+        [TestCase('A', "XXXXXX")]
+        public void CharTextRedactsCorrectly(char value, string expectedAttributeValue)
+        {
+            _testClass.CharTextProperty = new CharText { Value = value };
+
+            var xml = Serialize();
+            Console.WriteLine(xml);
+
+            Assert.That(xml, Contains.Substring(string.Format("<CharTextProperty>{0}</CharTextProperty>", expectedAttributeValue)));
+        }
+
+
         [Test]
         public void NullableBoolAttributeWithNullValueDoesNotSerialize()
         {
@@ -109,6 +132,32 @@ namespace XSerializer.Tests
             var instance = _serializer.Deserialize(xml);
 
             Assert.That(instance.BoolTextProperty.Value, Is.False);
+        }
+
+        [Test]
+        public void RedactedCharAttributeDeserializesCorrectly()
+        {
+            var xml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<RedactTestClassForXmlText xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+    <CharTextProperty>XXXXXX</CharTextProperty>
+</RedactTestClassForXmlText>";
+
+            var instance = _serializer.Deserialize(xml);
+
+            Assert.That(instance.CharTextProperty.Value, Is.EqualTo(default(char)));
+        }
+
+        [Test]
+        public void RedactedNullableCharAttributeDeserializesCorrectly()
+        {
+            var xml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<RedactTestClassForXmlText xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+    <NullableCharTextProperty>XXXXXX</NullableCharTextProperty>
+</RedactTestClassForXmlText>";
+
+            var instance = _serializer.Deserialize(xml);
+
+            Assert.That(instance.NullableCharTextProperty.Value, Is.Null);
         }
 
         [TestCase(RedactEnumForXmlText.First, "XXXXXXXXXX")]
@@ -498,6 +547,8 @@ namespace XSerializer.Tests
             public DateTimeText DateTimeTextProperty { get; set; }
             public IntText IntTextProperty { get; set; }
             public DoubleText DoubleTextProperty { get; set; }
+            public CharText CharTextProperty { get; set; }
+            public NullableCharText NullableCharTextProperty { get; set; }
         }
 
         public class StringText
@@ -547,6 +598,20 @@ namespace XSerializer.Tests
             [Redact]
             [XmlText]
             public bool Value { get; set; }
+        }
+
+        public class CharText
+        {
+            [Redact]
+            [XmlText]
+            public char Value { get; set; }
+        }
+
+        public class NullableCharText
+        {
+            [Redact]
+            [XmlText]
+            public char? Value { get; set; }
         }
 
         public class RedactEnumText
