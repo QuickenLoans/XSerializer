@@ -1,14 +1,12 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 using XSerializer.Encryption;
-using XSerializer.Tests.Encryption;
 
 namespace XSerializer.Tests
 {
     public class EncryptionBugs
     {
         private static readonly IEncryptionMechanism _encryptionMechanism = new EncryptionMarker();
-        private static readonly Base64EncryptionMechanism _base64EncryptionMechanism = new Base64EncryptionMechanism();
 
         public class Foo
         {
@@ -42,33 +40,6 @@ namespace XSerializer.Tests
                 .WithEncryptKey(typeof(Foo)));
 
             Assert.That(() => serializer.Deserialize(xml), Throws.Nothing);
-        }
-
-        [TestCase("Boots &amp; cats &amp; boots &amp; cats", "Boots & cats & boots & cats")]
-        [TestCase("&quot;Double quotes&quot;", "\"Double quotes\"")]
-        [TestCase("One &lt; two", "One < two")]
-        [TestCase("Two &gt; one", "Two > one")]
-        [TestCase("What&apos;s up?", "What's up?")]
-        public void XmlSerializer_PropertyMarkedEncryptContainingEscapedCharsIsDeserialized_CharactersAreUnescaped(string escapedText, string expectedValue)
-        {
-            var serializer = new XmlSerializer<Foo>(x => x
-            .WithEncryptionMechanism(_base64EncryptionMechanism)
-            .WithEncryptKey(typeof(Foo)));
-
-            var xml = string.Format("<Foo><Bar>{0}</Bar></Foo>", _base64EncryptionMechanism.Encrypt(escapedText));
-
-            Assert.AreEqual(expectedValue, serializer.Deserialize(xml).Bar);
-        }
-
-        [TestCase("Qm9vdHMgJmFtcDsgY2F0cyAmYW1wOyBib290cyAmYW1wOyBjYXRz", "Qm9vdHMgJmFtcDsgY2F0cyAmYW1wOyBib290cyAmYW1wOyBjYXRz")]
-        public void XmlSerializer_PropertyMarkedWithEncryptAttributeContainingBase64String_ReturnsBase64String(string escapedText, string expectedValue)
-        {
-            // No encryption mechanism specified
-            var serializer = new XmlSerializer<Foo>();
-
-            var xml = string.Format("<Foo><Bar>{0}</Bar></Foo>", escapedText);
-
-            Assert.AreEqual(expectedValue, serializer.Deserialize(xml).Bar);
         }
 
         [Test]
