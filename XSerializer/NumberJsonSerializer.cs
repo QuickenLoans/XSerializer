@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace XSerializer
 {
@@ -133,57 +134,57 @@ namespace XSerializer
             if (_type == typeof(double) || _type == typeof(double?))
             {
                 writeAction = (writer, value) => writer.WriteValue((double)value);
-                readFuncLocal = value => double.Parse(value);
+                readFuncLocal = value => double.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(int) || _type == typeof(int?))
             {
                 writeAction = (writer, value) => writer.WriteValue((int)value);
-                readFuncLocal = value => int.Parse(value);
+                readFuncLocal = value => int.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(long) || _type == typeof(long?))
             {
                 writeAction = (writer, value) => writer.WriteValue((long)value);
-                readFuncLocal = value => long.Parse(value);
+                readFuncLocal = value => long.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(uint) || _type == typeof(uint?))
             {
                 writeAction = (writer, value) => writer.WriteValue((uint)value);
-                readFuncLocal = value => uint.Parse(value);
+                readFuncLocal = value => uint.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(byte) || _type == typeof(byte?))
             {
                 writeAction = (writer, value) => writer.WriteValue((byte)value);
-                readFuncLocal = value => byte.Parse(value);
+                readFuncLocal = value => byte.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(sbyte) || _type == typeof(sbyte?))
             {
                 writeAction = (writer, value) => writer.WriteValue((sbyte)value);
-                readFuncLocal = value => sbyte.Parse(value);
+                readFuncLocal = value => sbyte.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(short) || _type == typeof(short?))
             {
                 writeAction = (writer, value) => writer.WriteValue((short)value);
-                readFuncLocal = value => short.Parse(value);
+                readFuncLocal = value => short.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(ushort) || _type == typeof(ushort?))
             {
                 writeAction = (writer, value) => writer.WriteValue((ushort)value);
-                readFuncLocal = value => ushort.Parse(value);
+                readFuncLocal = value => ushort.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(ulong) || _type == typeof(ulong?))
             {
                 writeAction = (writer, value) => writer.WriteValue((ulong)value);
-                readFuncLocal = value => ulong.Parse(value);
+                readFuncLocal = value => ulong.Parse(value, CultureInfo.InvariantCulture);
             }
             else if(_type == typeof(float) || _type == typeof(float?))
             {
                 writeAction = (writer, value) => writer.WriteValue((float)value);
-                readFuncLocal = value => float.Parse(value);
+                readFuncLocal = value => float.Parse(value, CultureInfo.InvariantCulture);
             }
             else if (_type == typeof(decimal) || _type == typeof(decimal?))
             {
                 writeAction = (writer, value) => writer.WriteValue((decimal)value);
-                readFuncLocal = value => decimal.Parse(value);
+                readFuncLocal = value => decimal.Parse(value, CultureInfo.InvariantCulture);
             }
             else
             {

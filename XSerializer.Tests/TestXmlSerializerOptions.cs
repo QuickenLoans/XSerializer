@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 
 namespace XSerializer.Tests
 {
@@ -18,5 +19,6 @@ namespace XSerializer.Tests
         public bool TreatEmptyElementAsString { get; set; }
         public bool ShouldAlwaysEmitNil { get; set; }
         public bool ShouldUseAttributeDefinedInInterface { get; set; }
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
     }
 }

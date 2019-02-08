@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -183,7 +184,8 @@ namespace XSerializer
                 ShouldEncrypt = serializeOptions.ShouldEncrypt,
                 ShouldRedact = serializeOptions.ShouldRedact,
                 ShouldIgnoreCaseForEnum = serializeOptions.ShouldIgnoreCaseForEnum,
-                ShouldSerializeCharAsInt = serializeOptions.ShouldSerializeCharAsInt
+                ShouldSerializeCharAsInt = serializeOptions.ShouldSerializeCharAsInt,
+                Culture = serializeOptions.Culture
             };
         }
 
@@ -199,6 +201,12 @@ namespace XSerializer
             public SerializationState SerializationState { get; set; }
             public bool ShouldIgnoreCaseForEnum { get; set; }
             public bool ShouldSerializeCharAsInt { get; set; }
+            public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
+
+            public SerializeOptions()
+            {
+
+            }
         }
 
         public static string AppendProperty(this string path, string property)

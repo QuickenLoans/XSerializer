@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BooleanTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CharTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConditionalSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CultureTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomJsonSerializerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DateTimeOffsetTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DefaultDateTimeHandlerTests.cs" />

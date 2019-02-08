@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+using System.Globalization;
+using System.Xml.Serialization;
 using XSerializer.Encryption;
 
 namespace XSerializer
@@ -15,5 +16,6 @@ namespace XSerializer
         SerializationState SerializationState { get; }
         bool ShouldIgnoreCaseForEnum { get; }
         bool ShouldSerializeCharAsInt { get; }
+        CultureInfo Culture { get; }
     }
 }

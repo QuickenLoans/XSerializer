@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -579,7 +580,7 @@ namespace XSerializer
                         else
                         {
                             double dummy;
-                            if (!double.TryParse(valueString, out dummy))
+                            if (!double.TryParse(valueString, NumberStyles.Float, CultureInfo.InvariantCulture, out dummy))
                             {
                                 valueString = string.Format(@"""{0}""", valueString);
                             }

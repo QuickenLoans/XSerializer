@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace XSerializer
@@ -16,7 +17,8 @@ namespace XSerializer
                 RedactAttribute = options.RedactAttribute,
                 TreatEmptyElementAsString = options.TreatEmptyElementAsString,
                 ShouldAlwaysEmitNil = options.ShouldAlwaysEmitNil,
-                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface
+                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface,
+                Culture = options.Culture
             };
         }
 
@@ -35,7 +37,8 @@ namespace XSerializer
                 RedactAttribute = options.RedactAttribute,
                 TreatEmptyElementAsString = options.TreatEmptyElementAsString,
                 ShouldAlwaysEmitNil = options.ShouldAlwaysEmitNil,
-                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface
+                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface,
+                Culture = options.Culture
             };
         }
 
@@ -49,7 +52,8 @@ namespace XSerializer
                 RedactAttribute = redactAttribute,
                 TreatEmptyElementAsString = options.TreatEmptyElementAsString,
                 ShouldAlwaysEmitNil = options.ShouldAlwaysEmitNil,
-                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface
+                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface,
+                Culture = options.Culture
             };
         }
 
@@ -63,7 +67,8 @@ namespace XSerializer
                 RedactAttribute = options.RedactAttribute,
                 TreatEmptyElementAsString = options.TreatEmptyElementAsString,
                 ShouldAlwaysEmitNil = true,
-                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface
+                ShouldUseAttributeDefinedInInterface = options.ShouldUseAttributeDefinedInInterface,
+                Culture = options.Culture
             };
         }
 
@@ -76,6 +81,7 @@ namespace XSerializer
             public bool TreatEmptyElementAsString { get; set; }
             public bool ShouldAlwaysEmitNil { get; set; }
             public bool ShouldUseAttributeDefinedInInterface { get; set; }
+            public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
         }
     }
 }

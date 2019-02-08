@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace XSerializer
@@ -153,8 +154,8 @@ namespace XSerializer
             }
 
             return redactEnabled
-                ? Letters.Replace(AllNumbers.Replace(value.ToString(), "1"), "X")
-                : value.ToString();
+                ? Letters.Replace(AllNumbers.Replace(Convert.ToString(value, CultureInfo.InvariantCulture), "1"), "X")
+                : Convert.ToString(value, CultureInfo.InvariantCulture);
         }
     }
 }
