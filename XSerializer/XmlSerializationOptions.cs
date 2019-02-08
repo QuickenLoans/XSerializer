@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Text;
 using System.Xml.Serialization;
 using XSerializer.Encryption;
@@ -24,6 +25,7 @@ namespace XSerializer
         private bool _shouldIgnoreCaseForEnum;
         private bool _shouldSerializeCharAsInt;
         private bool _shouldUseAttributeDefinedInInterface;
+        private CultureInfo _culture;
 
         public XmlSerializationOptions(
             XmlSerializerNamespaces namespaces,
@@ -44,7 +46,31 @@ namespace XSerializer
             : this(namespaces, encoding, shouldEncryptRootObject, defaultNamespace,
                     shouldIndent, rootElementName, shouldAlwaysEmitTypes, shouldRedact,
                     shouldEncrypt, treatEmptyElementAsString, emitNil, encryptionMechanism,
-                    encryptKey, shouldIgnoreCaseForEnum, shouldSerializeCharAsInt, false)
+                    encryptKey, shouldIgnoreCaseForEnum, shouldSerializeCharAsInt, false, CultureInfo.InvariantCulture)
+        {
+        }
+
+        public XmlSerializationOptions(
+            XmlSerializerNamespaces namespaces,
+            Encoding encoding,
+            bool shouldEncryptRootObject,
+            string defaultNamespace,
+            bool shouldIndent,
+            string rootElementName,
+            bool shouldAlwaysEmitTypes,
+            bool shouldRedact,
+            bool shouldEncrypt,
+            bool treatEmptyElementAsString,
+            bool emitNil,
+            IEncryptionMechanism encryptionMechanism,
+            object encryptKey,
+            bool shouldIgnoreCaseForEnum,
+            bool shouldSerializeCharAsInt,
+            CultureInfo culture)
+            : this(namespaces, encoding, shouldEncryptRootObject, defaultNamespace,
+                    shouldIndent, rootElementName, shouldAlwaysEmitTypes, shouldRedact,
+                    shouldEncrypt, treatEmptyElementAsString, emitNil, encryptionMechanism,
+                    encryptKey, shouldIgnoreCaseForEnum, shouldSerializeCharAsInt, false, culture)
         {
         }
 
@@ -64,7 +90,8 @@ namespace XSerializer
             object encryptKey = null,
             bool shouldIgnoreCaseForEnum = false,
             bool shouldSerializeCharAsInt = false,
-            bool shouldUseAttributeDefinedInInterface = false)
+            bool shouldUseAttributeDefinedInInterface = false,
+            CultureInfo culture = null)
         {
             _namespaces = namespaces ?? new XmlSerializerNamespaces();
             _encoding = encoding ?? Encoding.UTF8;
@@ -83,6 +110,7 @@ namespace XSerializer
             _shouldIgnoreCaseForEnum = shouldIgnoreCaseForEnum;
             _shouldSerializeCharAsInt = shouldSerializeCharAsInt;
             _shouldUseAttributeDefinedInInterface = shouldUseAttributeDefinedInInterface;
+            _culture = culture ?? CultureInfo.InvariantCulture;
         }
 
         internal Encoding Encoding { get { return _encoding; } }
@@ -97,6 +125,8 @@ namespace XSerializer
         Type[] IXmlSerializerOptions.ExtraTypes { get { return _extraTypes; } }
         RedactAttribute IXmlSerializerOptions.RedactAttribute { get { return null; } }
         bool IXmlSerializerOptions.TreatEmptyElementAsString { get { return _treatEmptyElementAsString; } }
+        public CultureInfo Culture { get { return _culture; } set { _culture = value; } }
+
 
         bool IXmlSerializerOptions.ShouldAlwaysEmitNil
         {
@@ -200,7 +230,7 @@ namespace XSerializer
             _shouldIgnoreCaseForEnum = true;
             return this;
         }
-		
+
         public XmlSerializationOptions SerializeCharAsInt()
         {
             _shouldSerializeCharAsInt = true;

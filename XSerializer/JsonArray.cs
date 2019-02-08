@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -854,7 +855,7 @@ namespace XSerializer
             }
 
             byte value;
-            return byte.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return byte.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -867,7 +868,7 @@ namespace XSerializer
             }
 
             sbyte value;
-            return sbyte.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return sbyte.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -880,7 +881,7 @@ namespace XSerializer
             }
 
             short value;
-            return short.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return short.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -893,7 +894,7 @@ namespace XSerializer
             }
 
             ushort value;
-            return ushort.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return ushort.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -906,7 +907,7 @@ namespace XSerializer
             }
 
             int value;
-            return int.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return int.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -919,7 +920,7 @@ namespace XSerializer
             }
 
             uint value;
-            return uint.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return uint.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -932,7 +933,7 @@ namespace XSerializer
             }
 
             long value;
-            return long.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return long.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -945,7 +946,7 @@ namespace XSerializer
             }
 
             ulong value;
-            return ulong.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return ulong.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -958,7 +959,7 @@ namespace XSerializer
             }
 
             float value;
-            return float.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return float.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }
@@ -971,7 +972,7 @@ namespace XSerializer
             }
 
             decimal value;
-            return decimal.TryParse(((JsonNumber)transformableValue).StringValue, out value)
+            return decimal.TryParse(((JsonNumber)transformableValue).StringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out value)
                 ? value
                 : currentItem;
         }

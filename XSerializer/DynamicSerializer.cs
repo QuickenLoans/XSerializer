@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Xml;
 using XSerializer.Encryption;
 
@@ -205,7 +206,7 @@ namespace XSerializer
                         }
 
                         int intValue;
-                        if (int.TryParse(stringValue, out intValue))
+                        if (int.TryParse(stringValue, NumberStyles.Integer, options.GetCulture(), out intValue))
                         {
                             // If this is a number with leading zeros, treat it as a string so we don't lose those leading zeros.
                             if (stringValue[0] == '0' && stringValue.Length > 1)
@@ -221,14 +222,15 @@ namespace XSerializer
                         }
 
                         decimal decimalValue;
-                        if (decimal.TryParse(stringValue, out decimalValue))
+                        if (decimal.TryParse(stringValue, NumberStyles.Float, options.GetCulture(), out decimalValue))
                         {
                             instance = decimalValue;
                             break;
                         }
 
                         DateTime dateTimeValue;
-                        if (DateTime.TryParse(stringValue, out dateTimeValue))
+                        if (DateTime.TryParse(stringValue, options.GetCulture(), DateTimeStyles.None, out dateTimeValue)
+                            || DateTime.TryParse(stringValue, out dateTimeValue))
                         {
                             instance = dateTimeValue.ToUniversalTime();
                             break;

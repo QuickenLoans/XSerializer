@@ -110,37 +110,37 @@ namespace XSerializer
 
         public void WriteValue(double value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(float value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(decimal value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(int value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(long value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(uint value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(ulong value)
         {
-            _currentWriter.Write(value);
+            _currentWriter.Write(value.ToString(CultureInfo.InvariantCulture));
         }
 
         public void WriteValue(bool value)

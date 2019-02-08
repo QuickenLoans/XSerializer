@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 
 namespace XSerializer
 {
@@ -11,7 +12,7 @@ namespace XSerializer
         {
             _stringValue = value;
 
-            if (!double.TryParse(value, out _doubleValue))
+            if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _doubleValue))
             {
                 throw new ArgumentException("Invalid number value: " + value, "value");
             }

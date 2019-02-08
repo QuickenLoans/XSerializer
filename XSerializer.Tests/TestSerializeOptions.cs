@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+using System.Globalization;
+using System.Xml.Serialization;
 using XSerializer.Encryption;
 
 namespace XSerializer.Tests
@@ -31,5 +32,6 @@ namespace XSerializer.Tests
         public SerializationState SerializationState { get; set; }
         public bool ShouldIgnoreCaseForEnum { get; set; }
         public bool ShouldSerializeCharAsInt { get; set; }
+        public CultureInfo Culture { get; set; } = CultureInfo.InvariantCulture;
     }
 }

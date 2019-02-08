@@ -628,7 +628,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 byte byteResult;
-                if (byte.TryParse(value, out byteResult))
+                if (byte.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out byteResult))
                 {
                     result = byteResult;
                     _projections.Add(binderName, result);
@@ -647,7 +647,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 sbyte sbyteResult;
-                if (sbyte.TryParse(value, out sbyteResult))
+                if (sbyte.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out sbyteResult))
                 {
                     result = sbyteResult;
                     _projections.Add(binderName, result);
@@ -666,7 +666,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 short shortResult;
-                if (short.TryParse(value, out shortResult))
+                if (short.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out shortResult))
                 {
                     result = shortResult;
                     _projections.Add(binderName, result);
@@ -685,7 +685,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 ushort ushortResult;
-                if (ushort.TryParse(value, out ushortResult))
+                if (ushort.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushortResult))
                 {
                     result = ushortResult;
                     _projections.Add(binderName, result);
@@ -704,7 +704,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 int intResult;
-                if (int.TryParse(value, out intResult))
+                if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out intResult))
                 {
                     result = intResult;
                     _projections.Add(binderName, result);
@@ -723,7 +723,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 uint uintResult;
-                if (uint.TryParse(value, out uintResult))
+                if (uint.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out uintResult))
                 {
                     result = uintResult;
                     _projections.Add(binderName, result);
@@ -742,7 +742,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 long longResult;
-                if (long.TryParse(value, out longResult))
+                if (long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out longResult))
                 {
                     result = longResult;
                     _projections.Add(binderName, result);
@@ -761,7 +761,7 @@ namespace XSerializer
                 TruncateNumber(ref value);
 
                 ulong ulongResult;
-                if (ulong.TryParse(value, out ulongResult))
+                if (ulong.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out ulongResult))
                 {
                     result = ulongResult;
                     _projections.Add(binderName, result);

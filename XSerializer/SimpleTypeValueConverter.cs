@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Globalization;
 
@@ -238,12 +238,12 @@ namespace XSerializer
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                return (value, options) => string.IsNullOrEmpty(value) ? null : Convert.ChangeType(value, type.GetGenericArguments()[0]);
+                return (value, options) => string.IsNullOrEmpty(value) ? null : Convert.ChangeType(value, type.GetGenericArguments()[0], options.GetCulture());
             }
 
             {
                 var defaultValue = type.IsValueType ? Activator.CreateInstance(type) : null;
-                return (value, options) => string.IsNullOrEmpty(value) ? defaultValue : Convert.ChangeType(value, type);
+                return (value, options) => string.IsNullOrEmpty(value) ? defaultValue : Convert.ChangeType(value, type, options.GetCulture());
             }
         }
 
@@ -299,7 +299,7 @@ namespace XSerializer
                 return GetStringFromNullableChar;
             }
 
-            return (value, options) => value.ToString();
+            return (value, options) => Convert.ToString(value, options.GetCulture());
         }
 
         private static object ParseStringForDateTime(string value, ISerializeOptions options)
@@ -311,7 +311,7 @@ namespace XSerializer
 
             return DateTime.Parse(
                 value,
-                CultureInfo.InvariantCulture,
+                options.GetCulture(),
                 DateTimeStyles.RoundtripKind);
         }
 
@@ -349,7 +349,7 @@ namespace XSerializer
 
             return DateTime.Parse(
                 value,
-                CultureInfo.InvariantCulture,
+                options.GetCulture(),
                 DateTimeStyles.RoundtripKind);
         }
 
@@ -362,7 +362,7 @@ namespace XSerializer
 
             return DateTimeOffset.Parse(
                 value,
-                CultureInfo.InvariantCulture,
+                options.GetCulture(),
                 DateTimeStyles.RoundtripKind);
         }
 
@@ -375,7 +375,7 @@ namespace XSerializer
 
             return DateTimeOffset.Parse(
                 value,
-                CultureInfo.InvariantCulture,
+                options.GetCulture(),
                 DateTimeStyles.RoundtripKind);
         }
 
@@ -386,7 +386,7 @@ namespace XSerializer
                 return new TimeSpan();
             }
 
-            return TimeSpan.Parse(value, CultureInfo.InvariantCulture);
+            return TimeSpan.Parse(value, options.GetCulture());
         }
 
         private static object ParseStringForNullableTimeSpan(string value, ISerializeOptions options)
@@ -396,7 +396,7 @@ namespace XSerializer
                 return null;
             }
 
-            return TimeSpan.Parse(value, CultureInfo.InvariantCulture);
+            return TimeSpan.Parse(value, options.GetCulture());
         }
 
         private static object ParseStringForGuid(string value, ISerializeOptions options)
@@ -459,7 +459,7 @@ namespace XSerializer
         private static string GetStringFromDateTime(object value, ISerializeOptions options)
         {
             var dateTime = (DateTime)value;
-            return dateTime.ToString("O");
+            return dateTime.ToString("O", options.GetCulture());
         }
 
         private static string GetStringFromNullableDateTime(object value, ISerializeOptions options)
@@ -470,7 +470,7 @@ namespace XSerializer
         private static string GetStringFromDateTimeOffset(object value, ISerializeOptions options)
         {
             var dateTimeOffset = (DateTimeOffset)value;
-            return dateTimeOffset.ToString("O");
+            return dateTimeOffset.ToString("O", options.GetCulture());
         }
 
         private static string GetStringFromNullableDateTimeOffset(object value, ISerializeOptions options)
@@ -481,7 +481,7 @@ namespace XSerializer
         private static string GetStringFromTimeSpan(object value, ISerializeOptions options)
         {
             var timeSpan = (TimeSpan)value;
-            return timeSpan.ToString("G");
+            return timeSpan.ToString("G", options.GetCulture());
         }
 
         private static string GetStringFromNullableTimeSpan(object value, ISerializeOptions options)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 
 namespace XSerializer.Tests
@@ -20,7 +20,9 @@ namespace XSerializer.Tests
             var s = string.Format("2016-02-24T02:29:33{0}-05:00", fractionalPart);
             var value = handler.ParseDateTime(s);
 
-            var expectedValue = new DateTime(2016, 2, 24, 2, 29, 33, DateTimeKind.Local).AddTicks(expectedAdditionalTicks);
+            var expectedValue = new DateTime(2016, 2, 24, 7, 29, 33, DateTimeKind.Utc)
+                .ToLocalTime()
+                .AddTicks(expectedAdditionalTicks);
 
             Assert.That(value, Is.EqualTo(expectedValue));
             Assert.That(value.Kind, Is.EqualTo(DateTimeKind.Local));
